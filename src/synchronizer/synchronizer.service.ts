@@ -125,7 +125,9 @@ export class SynchronizerService {
       const maxDiscreteValue = parentToggle.position_preset - 1 || 100;
       dependentToggle.analog_value =
         (parentToggle.discrete_value / maxDiscreteValue) * 100; // Преобразование
-      this.logger.log(`analog value by id ${dependentToggle.id} is ${dependentToggle.analog_value}`);
+      this.logger.log(
+        `analog value by id ${dependentToggle.id} is ${dependentToggle.analog_value}`,
+      );
     } else if (
       parentToggle.data_type === 'analog' &&
       dependentToggle.data_type === 'discrete'
@@ -137,7 +139,6 @@ export class SynchronizerService {
       );
     }
   }
-
 
   async initializeSession(
     sessionId: number,

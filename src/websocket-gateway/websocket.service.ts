@@ -14,6 +14,7 @@ import {
   SessionWithToggles,
 } from 'src/session/session.controller';
 import { SessionService } from '../session/session.service';
+import { DrawerService } from '../drawer/drawer.service';
 
 @WebSocketGateway({
   namespace: '/state',
@@ -29,6 +30,7 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly synchronizerService: SynchronizerService,
     private readonly sessionService: SessionService,
+    private readonly drawerService: DrawerService,
   ) {}
 
   async handleConnection(@ConnectedSocket() client: Socket): Promise<void> {
@@ -79,6 +81,8 @@ export class StateGateway implements OnGatewayConnection, OnGatewayDisconnect {
         sessionId,
         toggles,
       );
+
+      this.drawerService.drawToggles(createdToggles, `${sessionName}_drawn`);
       client.emit('initSuccess', {
         message: 'Session created successfully',
         sessionId,
