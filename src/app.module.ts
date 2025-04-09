@@ -1,19 +1,14 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ToggleModule } from './toggles/toggles.module';
-import { SessionModule } from './session/session.module';
-import { ControlledItemModule } from './controlled-item/controlled-item.module';
+import { SynchronizerModule } from './synchronizer/synchronizer.module';
+import { StateGatewayModule } from './websocket-gateway/websocket.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost:27017'),
-    ToggleModule,
-    ControlledItemModule,
-    SessionModule,
+    MongooseModule.forRoot('mongodb://localhost:27017/state-machine'),
+    StateGatewayModule,
+    SynchronizerModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [],
 })
 export class AppModule {}

@@ -1,9 +1,9 @@
-import { Model, Document} from 'mongoose';
+import { Model, Document } from 'mongoose';
 
 export class BaseRepository<T> {
   constructor(protected readonly model: Model<T>) {}
 
-  async create(item: T): Promise<Document<unknown, {}, T>> {
+  async create(item: T): Promise<Document<unknown, object, T>> {
     const newItem = new this.model(item);
     return newItem.save();
   }

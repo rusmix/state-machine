@@ -6,7 +6,9 @@ import { Session } from './session.model';
 export class SessionService {
   constructor(private readonly sessionRepository: SessionRepository) {}
 
-  async createSession(session: Session): Promise<Session> {
+  async create(session: Partial<Session>): Promise<Session> {
+    const id = await this.sessionRepository.getMaxId();
+    session.id = id + 1;
     return this.sessionRepository.create(session);
   }
 

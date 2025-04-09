@@ -1,39 +1,36 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { ControlledItem } from 'src/controlled-item/controlled-item.model';
 import { SynchronizerService } from 'src/synchronizer/synchronizer.service';
 import { IToggle } from 'src/toggles/toggles.model';
+import { SessionService } from './session.service';
+import { IToggleInitial } from '../toggles/types';
 
 @Controller('sessions')
 export class SessionController {
-  constructor(private readonly synchronizerService: SynchronizerService) {}
+  constructor(
+    private readonly synchronizerService: SynchronizerService,
+    private readonly sessionService: SessionService,
+  ) {}
 
   @Post()
   async createSession(
     @Body()
-    {
-      items,
-      toggles,
-      sessionName,
-    }: {
-      items: ControlledItem[];
-      toggles: IToggle[];
-      sessionName: string;
-    },
+    { toggles, sessionName }: InitialSession,
   ) {
-    await this.synchronizerService.createSession(sessionName, items, toggles);
+    const { id: sessionId } = await this.sessionService.create({
+      name: sessionName,
+    });
+    await this.synchronizerService.initializeSession(sessionId, toggles);
     return { message: 'Session created successfully' };
   }
 }
 
-interface InitialSession {
-  items: ControlledItem[];
-  toggles: IToggle[];
-  sessionName: string;
+export interface InitialSession {
+  sessionId?: number;
+  toggles?: IToggleInitial[];
+  sessionName?: string;
 }
 
-export interface SessionWithItems {
+export interface SessionWithToggles {
   sessionId: number;
-  items: ControlledItem[];
   toggles: IToggle[];
 }
-

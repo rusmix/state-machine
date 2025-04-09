@@ -3,8 +3,8 @@ import { Schema, Document } from 'mongoose';
 export interface Session {
   id: number;
   name: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type SessionDocument = Session & Document;

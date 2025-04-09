@@ -18,6 +18,10 @@ export class ToggleService {
     return this.toggleRepository.findById(id);
   }
 
+  async findTogglesBySessionId(sessionId: number): Promise<IToggle[]> {
+    return this.toggleRepository.findTogglesBySessionId(sessionId);
+  }
+
   async updateToggle(
     id: number,
     updateData: Partial<IToggle>,

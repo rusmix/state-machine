@@ -10,7 +10,7 @@ export class SessionRepository {
     private readonly sessionModel: Model<SessionDocument>,
   ) {}
 
-  async create(session: Session): Promise<Session> {
+  async create(session: Partial<Session>): Promise<Session> {
     const newSession = new this.sessionModel(session);
     return newSession.save();
   }

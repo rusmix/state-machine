@@ -9,6 +9,6 @@ import { SessionService } from './session.service';
     MongooseModule.forFeature([{ name: 'Session', schema: SessionSchema }]),
   ],
   providers: [SessionRepository, SessionService],
-  exports: [SessionService],
+  exports: [SessionService, SessionRepository],
 })
 export class SessionModule {}

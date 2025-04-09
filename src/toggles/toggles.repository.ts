@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { IToggle, ToggleDocument } from './toggles.model';
+import { IToggleInitial } from './types';
 
 @Injectable()
 export class ToggleRepository {
@@ -9,8 +10,13 @@ export class ToggleRepository {
     @InjectModel('Toggle') private readonly toggleModel: Model<ToggleDocument>,
   ) {}
 
-  async createMany(toggles: IToggle[]): Promise<IToggle[]> {
-    return this.toggleModel.insertMany(toggles);
+  async createMany(toggles: IToggleInitial[]): Promise<IToggle[]> {
+    const maxId = await this.getMaxId();
+    const startId = maxId + 1;
+    const togglesToCreate = toggles.map((toggle, index) => {
+      return { ...toggle, id: startId + index } as IToggle;
+    });
+    return this.toggleModel.insertMany(togglesToCreate);
   }
 
   async create(toggle: IToggle): Promise<IToggle> {
@@ -20,6 +26,10 @@ export class ToggleRepository {
 
   async findAll(): Promise<IToggle[]> {
     return this.toggleModel.find().exec();
+  }
+
+  async findTogglesBySessionId(sessionId: number): Promise<IToggle[]> {
+    return this.toggleModel.find({ session_id: sessionId }).exec();
   }
 
   async findById(id: number): Promise<IToggle | null> {
@@ -39,52 +49,32 @@ export class ToggleRepository {
     return this.toggleModel.findOneAndDelete({ id }).exec();
   }
 
-  // Добавление устройства к переключателю
-  async addControlledItemToToggle(
-    toggleId: number,
-    controlledItemId: number,
-  ): Promise<IToggle | null> {
-    return this.toggleModel
-      .findOneAndUpdate(
-        { id: toggleId },
-        { $push: { controlled_items: controlledItemId } },
-        { new: true },
-      )
-      .exec();
-  }
-
-  // Удаление устройства из переключателя
-  async removeControlledItemFromToggle(
-    toggleId: number,
-    controlledItemId: number,
-  ): Promise<IToggle | null> {
-    return this.toggleModel
-      .findOneAndUpdate(
-        { id: toggleId },
-        { $pull: { controlled_items: controlledItemId } },
-        { new: true },
-      )
-      .exec();
-  }
-
   async updateMany(items: IToggle[]): Promise<IToggle[]> {
     const bulkOps = items.map((item) => ({
       updateOne: {
-        filter: { id: item.id }, 
-        update: { $set: item },  
+        filter: { id: item.id },
+        update: { $set: item },
         upsert: true,
       },
     }));
-  
+
     await this.toggleModel.bulkWrite(bulkOps);
-  
+
     return this.toggleModel.find({
       id: { $in: items.map((item) => item.id) },
     });
   }
 
   async findBySessionId(sessionId): Promise<IToggle[] | null> {
-    return this.toggleModel.find({ session_id: sessionId}).exec(); 
-   }
-  
+    return this.toggleModel.find({ session_id: sessionId }).exec();
+  }
+
+  async getMaxId(): Promise<number> {
+    const maxToggle = await this.toggleModel
+      .findOne({})
+      .sort({ id: -1 })
+      .exec();
+
+    return maxToggle ? maxToggle.id : 0;
+  }
 }

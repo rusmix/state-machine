@@ -9,6 +9,6 @@ import { ToggleService } from './toggles.service';
     MongooseModule.forFeature([{ name: 'Toggle', schema: ToggleSchema }]),
   ],
   providers: [ToggleRepository, ToggleService],
-  exports: [ToggleService],
+  exports: [ToggleService, ToggleRepository],
 })
 export class ToggleModule {}
